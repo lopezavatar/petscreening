@@ -25,7 +25,7 @@ user-invocable: true
 
 ## Execution Flow
 
-Follow **all six steps in order**. Do not skip or reorder steps.
+Follow **all seven steps in order**. Do not skip or reorder steps.
 
 ---
 
@@ -79,9 +79,10 @@ For each selected RTM requirement:
    - The test type: `@smoke`, `@regression`, `@api`, `@a11y`, `@visual`, `@security`, etc.
    - The priority: `@P0`, `@P1`, `@P2`, or `@P3`.
 3. Follow Gherkin best practices:
-   - Use `Background:` for shared preconditions within a feature.
+   - Use `Background:` **only** when every scenario in the feature shares the same business arrange (e.g. same login + same navigation). For technical setup that is transversal but heterogeneous (browser launch, snapshot fetch, console capture, cleanup) prefer **tagged hooks** (`Before({ tags: '@home' })`) instead.
    - Use `Scenario Outline:` + `Examples:` for data-driven cases.
    - Keep steps declarative and business-readable. No implementation details in Gherkin.
+   - For every requirement that involves a range, a count, a filter or a collection, include at minimum: the boundary value (min and max), an out-of-range / invalid value, and an empty result case. Derive the concrete values from the data snapshot (see Step 4.5), not from literals.
 
 **Example:**
 ```gherkin
@@ -94,13 +95,28 @@ Scenario: Catalog page loads successfully
 
 ---
 
+### Step 4.5 — Data-Resilience Audit (mandatory)
+
+Before finalizing the feature file, audit every scenario for coupling to the current seed.
+
+1. For each literal value in `Given`/`When`/`Then` (counts, prices, product names, IDs, category strings, dates), ask:
+   - Does this value come from the **spec** (page size = 6, allowed roles, fixed URLs) or from the **current seed** (15 products, "Cherry Lattice" exists, $32 price, "Georgia Peach" is out-of-stock)?
+   - If it comes from the seed, the assert is fragile: it will break (or produce false positives) the moment the seed changes, even though the requirement still holds.
+2. Replace seed-derived literals with values **derived at runtime** from a *snapshot* of the source of truth (API, DB, fixture file) taken once in a `Before` hook and exposed on the World.
+3. Allowed literals (do not refactor): values explicitly part of the spec. Mark them with a Gherkin comment noting *why* they are literal, e.g. `# spec: page size is fixed at 6`.
+4. Pickers must be **deterministic**. Helpers like `pickFirstInStock()` must order by a stable key from the API response (response order, alphabetic `id`, etc.) and **record the picked entity on the World** so `Then` steps can reconstruct expectations (subtotals, prices, names).
+5. Every `"every X satisfies Y"` assertion must be preceded by an explicit non-emptiness check (`expect(count).toBeGreaterThan(0)` or a `Then at least 1 X is visible` step). Never allow vacuous truths.
+6. If a scenario depends on a specific data shape (e.g. "a category that has at least N items"), pick that data dynamically from the snapshot instead of hard-coding the category name.
+
+---
+
 ### Step 5 — Code Generation
 
 #### 5a. Page Object (POM) — `test/pages/<FeaturePage>.ts`
 - Extend `BasePage`.
 - Define all confirmed locators as `readonly` properties using `data-testid` or ARIA roles.
 - Expose high-level action methods (e.g., `addToCart(pieName: string)`).
-- No assertions inside page objects — assertions belong in step definitions.
+- POM may contain **page-contract** assertions only (`assertPageLoaded`, `assertReady`) — assertions that verify the page itself is in a usable state. **Business / acceptance-criteria assertions belong in step definitions**, never in the POM.
 
 #### 5b. Step Definitions — `test/stepDefinitions/ui/<feature>Steps.ts`
 - Follow **AAA (Arrange-Act-Assert)**:
@@ -116,6 +132,12 @@ Scenario: Catalog page loads successfully
 - Add a new named fixture for each distinct user role (e.g., `bronzeUser`, `goldUser`).
 - Use `scope: 'test'` for isolation; `scope: 'worker'` only for expensive shared setup.
 
+#### 5e. Data Snapshot Fixture / Hook — required for data-driven features
+- In the feature's `Before` hook (or a custom fixture), fetch the source of truth (`GET /api/...`) **once per scenario** and store it on the World as a typed snapshot (e.g. `world.catalog = { products, total, available, outOfStock, byCategory, minPrice, maxPrice }`).
+- Expose helpers on the World: `pickFirstInStock()`, `pickCategoryWithStock()`, `recordCartAddition(p)`, etc. These keep step bodies short and reusable.
+- Do not re-fetch inside individual steps. The snapshot is the single source of truth for the scenario.
+- If the snapshot fetch fails, fail the scenario with a clear, distinct error (`catalog snapshot fetch failed: <status>`) so it cannot be confused with a UI assertion failure.
+
 #### 5d. API Tests — `test/stepDefinitions/api/<feature>Steps.ts`
 - Use `ApiClient` from `test/utils/apiClient.ts`.
 - Use builders from `test/utils/builders/` for request payloads.
@@ -127,6 +149,18 @@ Scenario: Catalog page loads successfully
 
 After generating the code, update the `Status` column of the referenced RTM for each implemented requirement:
 - Change `Not Started` → `Implemented` (or `In Progress` if only partially done).
+- If the RTM lists *example expected values* (e.g. "15 products", "$32") and your tests assert against the live snapshot rather than the literal, **do not modify the RTM value**. Add a short note in the `Notes` column: `test asserts via snapshot, not literal`.
+
+---
+
+### Step 7 — Result Interpretation
+
+1. A green suite is the goal but not the only valid outcome. If a well-designed, data-resilient test fails because of a real bug in the source under test:
+   - Do **not** soften the assertion to force green.
+   - Do **not** delete the scenario.
+   - Report the failure clearly, link it to the responsible source file/component, and (if the team wants to keep the suite green meanwhile) tag the scenario `@known-bug:<ticket-id>` and document the deviation. Remove the tag once the source is fixed.
+2. If a test fails because the *seed* changed but the *spec* still holds, the test is fragile — revisit Step 4.5 and refactor to be snapshot-driven.
+3. Always re-run the full suite after refactors; partial runs hide regressions in adjacent scenarios that share World state through hooks.
 
 ---
 
@@ -155,9 +189,10 @@ test/
 
 | Pattern | Location | Rule |
 |---------|----------|------|
-| POM | `test/pages/` | Locators + actions only; no assertions |
+| POM | `test/pages/` | Locators + actions + page-contract asserts only; no business asserts |
 | AAA | `test/stepDefinitions/` | Given=Arrange, When=Act, Then=Assert |
 | Fixtures | `test/fixtures/` | Auth state injection; never UI login for non-login tests |
+| **Data Snapshot** | `world` / `Before` hook | Fetch source of truth once; expose typed snapshot + deterministic pickers; never re-fetch inside steps |
 | Builder | `test/utils/builders/` | Fluent API for payloads/test data |
 | Factory | `test/utils/factories/` | Dynamic page/client instantiation |
 
@@ -184,3 +219,7 @@ test/
 4. **Always update dependents.** If you modify a shared function, update all callers.
 5. **RTM tags on every scenario.** Every `.feature` scenario must have its RTM ID tag.
 6. **Update RTM status.** Mark requirements as Implemented after generating their tests.
+7. **No seed-coupled literals.** Counts, prices, names, IDs and availability come from a runtime snapshot, not from hard-coded values. Spec values are the only exception and must be commented as such.
+8. **No vacuous truths.** Every `for-all` assertion must be guarded by a non-emptiness check.
+9. **Deterministic picks only.** Helpers that select "the first X" must use a stable ordering and record the choice on the World.
+10. **Failures from real bugs stay failing.** Never weaken an assert to force green; tag `@known-bug:<id>` if temporary suppression is required and remove the tag once fixed.
