@@ -1,0 +1,278 @@
+/* ============================================================
+   PIE IN THE SKY — Design Tokens
+   colors_and_type.css
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ============================================================
+   COLOR PRIMITIVES
+   ============================================================ */
+:root {
+  /* Sky — blues */
+  --sky-50:  #F0F8FF;
+  --sky-100: #E0F0FC;
+  --sky-200: #BAE0F9;
+  --sky-300: #7EC8F4;
+  --sky-400: #3DAAE8;
+  --sky-500: #1B8DD4;
+  --sky-600: #1070B0;
+  --sky-700: #0D548A;
+  --sky-800: #0A3F6B;
+  --sky-900: #072C4A;
+
+  /* Crust — warm amber/brown */
+  --crust-50:  #FFF8EE;
+  --crust-100: #FDEFD8;
+  --crust-200: #FAD9A8;
+  --crust-300: #F5BC6E;
+  --crust-400: #EF9C38;
+  --crust-500: #D97D18;
+  --crust-600: #B86210;
+  --crust-700: #8F4A0D;
+  --crust-800: #6B370E;
+  --crust-900: #5C3A1E;
+
+  /* Cherry — accent red */
+  --cherry-100: #FDECEA;
+  --cherry-300: #F09090;
+  --cherry-500: #C0392B;
+  --cherry-700: #8B1A11;
+
+  /* Cream — neutrals */
+  --cream-50:  #FDFAF5;
+  --cream-100: #F7F1E8;
+  --cream-200: #EDE4D5;
+  --cream-300: #D9CDBC;
+  --cream-400: #BFB09C;
+  --cream-500: #9E8E79;
+  --cream-600: #7A6C5A;
+  --cream-700: #5C5045;
+  --cream-800: #3D3530;
+  --cream-900: #201C18;
+}
+
+/* ============================================================
+   SEMANTIC COLOR TOKENS
+   ============================================================ */
+:root {
+  /* Backgrounds */
+  --bg:           var(--cream-50);
+  --bg-subtle:    var(--cream-100);
+  --bg-raised:    #FFFFFF;
+  --bg-overlay:   rgba(253, 250, 245, 0.88);
+  --bg-invert:    var(--crust-900);
+
+  /* Foregrounds */
+  --fg:           var(--crust-900);
+  --fg-muted:     var(--cream-600);
+  --fg-subtle:    var(--cream-400);
+  --fg-invert:    var(--cream-50);
+
+  /* Brand */
+  --brand:        var(--crust-500);
+  --brand-light:  var(--crust-200);
+  --brand-dark:   var(--crust-800);
+
+  /* Accent / Sky */
+  --sky:          var(--sky-500);
+  --sky-light:    var(--sky-100);
+  --sky-dark:     var(--sky-700);
+
+  /* Action */
+  --action:       var(--crust-500);
+  --action-hover: var(--crust-600);
+  --action-press: var(--crust-700);
+  --action-fg:    #FFFFFF;
+
+  /* Status */
+  --status-pending:   var(--sky-500);
+  --status-airborne:  var(--crust-500);
+  --status-delivered: #2D9E5F;
+  --status-sold-out:  var(--cream-500);
+  --status-error:     var(--cherry-500);
+
+  /* Borders */
+  --border:       var(--cream-200);
+  --border-strong: var(--cream-300);
+
+  /* Shadows */
+  --shadow-card:     0 4px 24px rgba(92, 58, 30, 0.09);
+  --shadow-elevated: 0 8px 40px rgba(92, 58, 30, 0.15);
+  --shadow-btn:      0 2px 12px rgba(217, 125, 24, 0.30);
+  --shadow-btn-hover:0 6px 20px rgba(217, 125, 24, 0.40);
+}
+
+/* ============================================================
+   TYPOGRAPHY PRIMITIVES
+   ============================================================ */
+:root {
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body:    'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+
+  /* Scale */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-md:   1.125rem;   /* 18px */
+  --text-lg:   1.25rem;    /* 20px */
+  --text-xl:   1.5rem;     /* 24px */
+  --text-2xl:  2rem;       /* 32px */
+  --text-3xl:  2.5rem;     /* 40px */
+  --text-4xl:  3.5rem;     /* 56px */
+  --text-5xl:  5rem;       /* 80px */
+
+  /* Leading */
+  --leading-tight:  1.15;
+  --leading-snug:   1.35;
+  --leading-normal: 1.6;
+  --leading-loose:  1.8;
+
+  /* Tracking */
+  --tracking-tight:  -0.03em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.06em;
+  --tracking-widest:  0.14em;
+}
+
+/* ============================================================
+   SEMANTIC TYPE TOKENS
+   ============================================================ */
+:root {
+  /* Headings */
+  --h1-font:    var(--font-display);
+  --h1-size:    var(--text-4xl);
+  --h1-weight:  700;
+  --h1-leading: var(--leading-tight);
+  --h1-tracking:var(--tracking-tight);
+
+  --h2-font:    var(--font-display);
+  --h2-size:    var(--text-3xl);
+  --h2-weight:  600;
+  --h2-leading: var(--leading-tight);
+
+  --h3-font:    var(--font-display);
+  --h3-size:    var(--text-xl);
+  --h3-weight:  600;
+  --h3-leading: var(--leading-snug);
+
+  /* Body */
+  --p-font:     var(--font-body);
+  --p-size:     var(--text-base);
+  --p-weight:   400;
+  --p-leading:  var(--leading-normal);
+
+  --p-sm-font:  var(--font-body);
+  --p-sm-size:  var(--text-sm);
+  --p-sm-weight:400;
+
+  /* Labels */
+  --label-font:     var(--font-body);
+  --label-size:     var(--text-sm);
+  --label-weight:   500;
+  --label-tracking: var(--tracking-wide);
+
+  --overline-font:     var(--font-body);
+  --overline-size:     var(--text-xs);
+  --overline-weight:   600;
+  --overline-tracking: var(--tracking-widest);
+  --overline-transform: uppercase;
+}
+
+/* ============================================================
+   SPACING TOKENS
+   ============================================================ */
+:root {
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+}
+
+/* ============================================================
+   RADIUS TOKENS
+   ============================================================ */
+:root {
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-pill: 9999px;
+}
+
+/* ============================================================
+   MOTION TOKENS
+   ============================================================ */
+:root {
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-base:   300ms;
+  --duration-slow:   600ms;
+  --duration-drone:  6000ms;
+}
+
+/* ============================================================
+   BASE ELEMENT STYLES (opt-in via class="pits-base")
+   ============================================================ */
+.pits-base {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+.pits-base h1 {
+  font-family: var(--h1-font);
+  font-size: var(--h1-size);
+  font-weight: var(--h1-weight);
+  line-height: var(--h1-leading);
+  letter-spacing: var(--h1-tracking);
+  color: var(--fg);
+}
+.pits-base h2 {
+  font-family: var(--h2-font);
+  font-size: var(--h2-size);
+  font-weight: var(--h2-weight);
+  line-height: var(--leading-tight);
+  color: var(--fg);
+}
+.pits-base h3 {
+  font-family: var(--h3-font);
+  font-size: var(--h3-size);
+  font-weight: var(--h3-weight);
+  line-height: var(--h3-leading);
+  color: var(--fg);
+}
+.pits-base p {
+  font-family: var(--p-font);
+  font-size: var(--p-size);
+  font-weight: var(--p-weight);
+  line-height: var(--p-leading);
+  color: var(--fg);
+}
+.pits-base .label {
+  font-family: var(--label-font);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  letter-spacing: var(--label-tracking);
+  color: var(--fg-muted);
+}
+.pits-base .overline {
+  font-family: var(--overline-font);
+  font-size: var(--overline-size);
+  font-weight: var(--overline-weight);
+  letter-spacing: var(--overline-tracking);
+  text-transform: var(--overline-transform);
+  color: var(--fg-subtle);
+}

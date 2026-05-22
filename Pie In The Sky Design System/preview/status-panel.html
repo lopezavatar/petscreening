@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F7F1E8; font-family: 'DM Sans', sans-serif; padding: 24px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+
+  .panel {
+    background: rgba(253,250,245,0.90);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(237,228,213,0.8);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(92,58,30,0.12);
+    padding: 28px; width: 280px;
+  }
+  .overline { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #9E8E79; margin-bottom: 16px; }
+
+  /* Drone icon inline */
+  .drone-wrap { text-align: center; margin-bottom: 16px; animation: float 4s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  .status-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: #5C3A1E; text-align: center; margin-bottom: 4px; }
+  .status-sub { font-size: 13px; color: #7A6C5A; text-align: center; margin-bottom: 20px; line-height: 1.5; }
+  .eta { display: flex; justify-content: center; align-items: baseline; gap: 4px; }
+  .eta-num { font-size: 40px; font-weight: 300; color: #D97D18; letter-spacing: -0.02em; }
+  .eta-unit { font-size: 14px; color: #9E8E79; }
+
+  .track { margin-top: 20px; }
+  .track-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .track-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .track-line { width: 2px; height: 14px; background: #EDE4D5; margin-left: 4px; margin-bottom: -4px; display: block; }
+  .track-label { font-size: 13px; color: #5C3A1E; font-weight: 500; }
+  .track-time { font-size: 12px; color: #9E8E79; margin-left: auto; }
+</style>
+</head><body>
+  <div class="panel">
+    <div class="overline">Delivery Status</div>
+    <div class="drone-wrap">
+      <svg width="48" height="48" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="28" cy="10" rx="12" ry="5" fill="#D97D18" opacity="0.85" transform="rotate(-20 28 10)"/>
+        <ellipse cx="28" cy="10" rx="12" ry="5" fill="#D97D18" opacity="0.45" transform="rotate(70 28 10)"/>
+        <circle cx="28" cy="10" r="4" fill="#8F4A0D"/>
+        <line x1="28" y1="14" x2="28" y2="26" stroke="#5C3A1E" stroke-width="2.5" stroke-linecap="round"/>
+        <ellipse cx="28" cy="32" rx="16" ry="6" fill="#F5BC6E"/>
+        <path d="M12 32 Q12 48 28 48 Q44 48 44 32 Z" fill="#EF9C38"/>
+        <ellipse cx="28" cy="32" rx="16" ry="6" fill="none" stroke="#D97D18" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="status-title">Your pie is airborne.</div>
+    <div class="status-sub">Flying to you now via Drone 7.</div>
+    <div class="eta"><span class="eta-num">9</span><span class="eta-unit">min away</span></div>
+    <div class="track">
+      <div class="track-row"><div class="track-dot" style="background:#2D9E5F"></div><div class="track-label">Order placed</div><div class="track-time">2:14 pm</div></div>
+      <span class="track-line" style="margin-left:8px"></span>
+      <div class="track-row"><div class="track-dot" style="background:#D97D18"></div><div class="track-label">Airborne</div><div class="track-time">2:18 pm</div></div>
+      <span class="track-line" style="margin-left:8px"></span>
+      <div class="track-row"><div class="track-dot" style="background:#EDE4D5"></div><div class="track-label">Delivered</div><div class="track-time">~ 2:27 pm</div></div>
+    </div>
+  </div>
+</body></html>

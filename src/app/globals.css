@@ -1,26 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Sky */
+  --sky-50:  #F0F8FF;
+  --sky-100: #E0F0FC;
+  --sky-200: #BAE0F9;
+  --sky-300: #7EC8F4;
+  --sky-400: #3DAAE8;
+  --sky-500: #1B8DD4;
+  --sky-600: #1070B0;
+  --sky-700: #0D548A;
+
+  /* Crust */
+  --crust-50:  #FFF8EE;
+  --crust-100: #FDEFD8;
+  --crust-200: #FAD9A8;
+  --crust-300: #F5BC6E;
+  --crust-400: #EF9C38;
+  --crust-500: #D97D18;
+  --crust-600: #B86210;
+  --crust-700: #8F4A0D;
+  --crust-800: #6B370E;
+  --crust-900: #5C3A1E;
+
+  /* Cherry */
+  --cherry-100: #FDECEA;
+  --cherry-300: #F09090;
+  --cherry-500: #C0392B;
+  --cherry-700: #8B1A11;
+
+  /* Cream */
+  --cream-50:  #FDFAF5;
+  --cream-100: #F7F1E8;
+  --cream-200: #EDE4D5;
+  --cream-300: #D9CDBC;
+  --cream-400: #BFB09C;
+  --cream-500: #9E8E79;
+  --cream-600: #7A6C5A;
+  --cream-700: #5C5045;
+  --cream-800: #3D3530;
+  --cream-900: #201C18;
+
+  /* Semantic */
+  --bg:           var(--cream-50);
+  --bg-subtle:    var(--cream-100);
+  --bg-raised:    #FFFFFF;
+  --bg-overlay:   rgba(253, 250, 245, 0.88);
+  --bg-invert:    var(--crust-900);
+  --fg:           var(--crust-900);
+  --fg-muted:     var(--cream-600);
+  --fg-subtle:    var(--cream-400);
+  --fg-invert:    var(--cream-50);
+  --brand:        var(--crust-500);
+  --brand-light:  var(--crust-200);
+  --brand-dark:   var(--crust-800);
+  --action:       var(--crust-500);
+  --action-hover: var(--crust-600);
+  --action-press: var(--crust-700);
+  --action-fg:    #FFFFFF;
+  --status-delivered: #2D9E5F;
+  --status-success:   #2D9E5F;
+  --status-warning:   #D97706;
+  --status-error:     var(--cherry-500);
+  --border:       var(--cream-200);
+  --border-strong: var(--cream-300);
+
+  /* Shadows */
+  --shadow-card:     0 4px 24px rgba(92, 58, 30, 0.09);
+  --shadow-elevated: 0 8px 40px rgba(92, 58, 30, 0.15);
+  --shadow-btn:      0 2px 12px rgba(217, 125, 24, 0.30);
+  --shadow-btn-hover:0 6px 20px rgba(217, 125, 24, 0.40);
+
+  /* Typography */
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body:    'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Motion */
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-base:   300ms;
+  --duration-slow:   600ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Rain overlay animation */
+@keyframes rain-fall {
+  0% { transform: translateY(-100vh); opacity: 0.7; }
+  100% { transform: translateY(100vh); opacity: 0.2; }
+}
+
+/* Drone bobbing */
+@keyframes drone-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

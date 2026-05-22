@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #FDFAF5; font-family: 'DM Sans', sans-serif; padding: 24px; display: flex; gap: 32px; flex-wrap: wrap; }
+  .section { flex: 1; min-width: 180px; }
+  .group-title { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9E8E79; margin-bottom: 12px; }
+  .radius-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .box { width: 36px; height: 36px; background: #F5BC6E; border: 1.5px solid #D97D18; flex-shrink: 0; }
+  .rlabel { font-size: 11px; color: #5C3A1E; font-weight: 500; }
+  .rval { font-size: 10px; color: #9E8E79; }
+  .shadow-box { width: 120px; height: 52px; background: #fff; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #7A6C5A; font-weight: 500; }
+</style>
+</head><body>
+<div class="section">
+  <div class="group-title">Radii</div>
+  <div class="radius-row"><div class="box" style="border-radius:6px"></div><div><div class="rlabel">--radius-sm</div><div class="rval">6px · badges, tags</div></div></div>
+  <div class="radius-row"><div class="box" style="border-radius:12px"></div><div><div class="rlabel">--radius-md</div><div class="rval">12px · inputs</div></div></div>
+  <div class="radius-row"><div class="box" style="border-radius:16px"></div><div><div class="rlabel">--radius-lg</div><div class="rval">16px · cards</div></div></div>
+  <div class="radius-row"><div class="box" style="border-radius:24px"></div><div><div class="rlabel">--radius-xl</div><div class="rval">24px · large panels</div></div></div>
+  <div class="radius-row"><div class="box" style="border-radius:9999px"></div><div><div class="rlabel">--radius-pill</div><div class="rval">9999px · buttons</div></div></div>
+</div>
+<div class="section">
+  <div class="group-title">Shadows</div>
+  <div class="shadow-box" style="box-shadow:0 4px 24px rgba(92,58,30,0.09)">--shadow-card</div>
+  <div class="shadow-box" style="box-shadow:0 8px 40px rgba(92,58,30,0.15)">--shadow-elevated</div>
+  <div class="shadow-box" style="box-shadow:0 2px 12px rgba(217,125,24,0.30);background:#D97D18;color:#fff">--shadow-btn</div>
+  <div class="shadow-box" style="box-shadow:0 6px 20px rgba(217,125,24,0.40);background:#D97D18;color:#fff">--shadow-btn-hover</div>
+</div>
+</body></html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F7F1E8; font-family: 'DM Sans', sans-serif; padding: 28px 32px; display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
+  .logo-wrap { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .version-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #9E8E79; }
+  .dark-bg { background: #5C3A1E; padding: 20px 28px; border-radius: 12px; }
+</style>
+</head><body>
+  <div class="logo-wrap">
+    <div class="version-label">On Light</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="260" fill="none">
+      <ellipse cx="28" cy="14" rx="10" ry="4" fill="#D97D18" opacity="0.85" transform="rotate(-20 28 14)"/>
+      <ellipse cx="28" cy="14" rx="10" ry="4" fill="#D97D18" opacity="0.55" transform="rotate(70 28 14)"/>
+      <circle cx="28" cy="14" r="3.5" fill="#8F4A0D"/>
+      <line x1="28" y1="17" x2="28" y2="27" stroke="#5C3A1E" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="28" cy="32" rx="14" ry="5" fill="#F5BC6E"/>
+      <path d="M14 32 Q14 46 28 46 Q42 46 42 32 Z" fill="#EF9C38"/>
+      <ellipse cx="28" cy="32" rx="14" ry="5" fill="none" stroke="#D97D18" stroke-width="1.5"/>
+      <path d="M22 26 Q20 22 22 19" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+      <path d="M28 25 Q26 21 28 18" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+      <path d="M34 26 Q32 22 34 19" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+      <text x="58" y="35" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="700" fill="#5C3A1E" letter-spacing="-0.5">Pie In The Sky</text>
+      <text x="59" y="54" font-family="'DM Sans', Arial, sans-serif" font-size="9" font-weight="600" fill="#9E8E79" letter-spacing="3.5">PIE DELIVERY</text>
+    </svg>
+  </div>
+  <div class="logo-wrap">
+    <div class="version-label">On Dark</div>
+    <div class="dark-bg">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="240" fill="none">
+        <ellipse cx="28" cy="14" rx="10" ry="4" fill="#F5BC6E" opacity="0.9" transform="rotate(-20 28 14)"/>
+        <ellipse cx="28" cy="14" rx="10" ry="4" fill="#FAD9A8" opacity="0.6" transform="rotate(70 28 14)"/>
+        <circle cx="28" cy="14" r="3.5" fill="#FAD9A8"/>
+        <line x1="28" y1="17" x2="28" y2="27" stroke="#FAD9A8" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="28" cy="32" rx="14" ry="5" fill="#F5BC6E"/>
+        <path d="M14 32 Q14 46 28 46 Q42 46 42 32 Z" fill="#EF9C38"/>
+        <ellipse cx="28" cy="32" rx="14" ry="5" fill="none" stroke="#FAD9A8" stroke-width="1.5"/>
+        <path d="M22 26 Q20 22 22 19" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        <path d="M28 25 Q26 21 28 18" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        <path d="M34 26 Q32 22 34 19" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        <text x="58" y="35" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="700" fill="#FDFAF5" letter-spacing="-0.5">Pie In The Sky</text>
+        <text x="59" y="54" font-family="'DM Sans', Arial, sans-serif" font-size="9" font-weight="600" fill="#FAD9A8" letter-spacing="3.5">PIE DELIVERY</text>
+      </svg>
+    </div>
+  </div>
+  <div class="logo-wrap">
+    <div class="version-label">Icon Only</div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="72" fill="none">
+      <ellipse cx="28" cy="10" rx="12" ry="5" fill="#D97D18" opacity="0.85" transform="rotate(-20 28 10)"/>
+      <ellipse cx="28" cy="10" rx="12" ry="5" fill="#D97D18" opacity="0.5" transform="rotate(70 28 10)"/>
+      <circle cx="28" cy="10" r="4" fill="#8F4A0D"/>
+      <line x1="28" y1="14" x2="28" y2="26" stroke="#5C3A1E" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="28" cy="32" rx="16" ry="6" fill="#F5BC6E"/>
+      <path d="M12 32 Q12 48 28 48 Q44 48 44 32 Z" fill="#EF9C38"/>
+      <ellipse cx="28" cy="32" rx="16" ry="6" fill="none" stroke="#D97D18" stroke-width="2"/>
+      <path d="M21 26 Q19 21 21 17" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+      <path d="M28 24 Q26 19 28 16" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <path d="M35 26 Q33 21 35 17" stroke="#BAE0F9" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    </svg>
+  </div>
+</body></html>

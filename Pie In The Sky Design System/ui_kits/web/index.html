@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pie In The Sky — Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #FDFAF5;
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  #root { width: 100%; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+  /* Sky background for top section */
+  .sky-bg {
+    width: 100%;
+    background: linear-gradient(180deg, #BAE0F9 0%, #E0F0FC 55%, #FDFAF5 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Tweak panel */
+  .tweak-panel {
+    position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+    background: rgba(253,250,245,0.96);
+    border: 1px solid #EDE4D5;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(92,58,30,0.14);
+    padding: 18px 20px;
+    width: 220px;
+    font-family: 'DM Sans', sans-serif;
+    display: none;
+  }
+  .tweak-panel.visible { display: block; }
+  .tweak-title { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #9E8E79; margin-bottom: 14px; }
+  .tweak-row { margin-bottom: 12px; }
+  .tweak-label { font-size: 12px; color: #5C3A1E; font-weight: 500; margin-bottom: 4px; display: block; }
+  .tweak-row select, .tweak-row input[type=range] { width: 100%; font-family: 'DM Sans', sans-serif; font-size: 12px; }
+  .tweak-row select { background: #F7F1E8; border: 1px solid #EDE4D5; border-radius: 6px; padding: 5px 8px; color: #5C3A1E; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="OrderButton.jsx"></script>
+<script type="text/babel" src="StatusPanel.jsx"></script>
+<script type="text/babel" src="SoldOut.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "initialScreen": "available",
+  "pieName": "Signature Cherry Lattice",
+  "deliveryMin": 12,
+  "price": "$24"
+}/*EDITMODE-END*/;
+
+// ── Clouds ──────────────────────────────────────────────────────
+const Cloud = ({ x, y, scale = 1, opacity = 0.6 }) => (
+  <g transform={`translate(${x},${y}) scale(${scale})`} opacity={opacity}>
+    <ellipse cx="40" cy="20" rx="30" ry="14" fill="white"/>
+    <ellipse cx="60" cy="16" rx="22" ry="12" fill="white"/>
+    <ellipse cx="20" cy="22" rx="18" ry="10" fill="white"/>
+    <ellipse cx="50" cy="26" rx="35" ry="10" fill="white"/>
+  </g>
+);
+
+const SkyScene = ({ droneY = 0 }) => (
+  <svg viewBox="0 0 390 260" style={{ width: '100%', display: 'block' }} preserveAspectRatio="xMidYMax meet">
+    <Cloud x={10} y={20} scale={0.9} opacity={0.5}/>
+    <Cloud x={230} y={35} scale={0.7} opacity={0.4}/>
+    <Cloud x={110} y={60} scale={1.1} opacity={0.35}/>
+    <g transform={`translate(175, ${60 + droneY})`}>
+      {/* Drone body */}
+      <ellipse cx="20" cy="8" rx="14" ry="5.5" fill="#D97D18" opacity="0.9" transform="rotate(-20 20 8)"/>
+      <ellipse cx="20" cy="8" rx="14" ry="5.5" fill="#D97D18" opacity="0.45" transform="rotate(70 20 8)"/>
+      <circle cx="20" cy="8" r="4.5" fill="#8F4A0D"/>
+      <line x1="20" y1="12" x2="20" y2="26" stroke="#5C3A1E" strokeWidth="2.5" strokeLinecap="round"/>
+      <ellipse cx="20" cy="32" rx="18" ry="7" fill="#F5BC6E"/>
+      <path d="M2 32 Q2 50 20 50 Q38 50 38 32 Z" fill="#EF9C38"/>
+      <ellipse cx="20" cy="32" rx="18" ry="7" fill="none" stroke="#D97D18" strokeWidth="2"/>
+      <path d="M10 26 Q8 21 10 17" stroke="#BAE0F9" strokeWidth="1.5" strokeLinecap="round" opacity="0.7"/>
+      <path d="M20 24 Q18 19 20 15" stroke="#BAE0F9" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+      <path d="M30 26 Q28 21 30 17" stroke="#BAE0F9" strokeWidth="1.5" strokeLinecap="round" opacity="0.7"/>
+    </g>
+  </svg>
+);
+
+// ── Header ───────────────────────────────────────────────────────
+const Header = () => (
+  <div style={{ padding: '24px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <img src="../../assets/logo.svg" alt="Pie In The Sky" style={{ height: 36 }}/>
+  </div>
+);
+
+// ── Available Screen ─────────────────────────────────────────────
+const AvailableScreen = ({ tweaks, onOrder, onSoldOut }) => {
+  const [ordering, setOrdering] = React.useState(false);
+
+  const handleOrder = () => {
+    setOrdering(true);
+    setTimeout(() => onOrder(), 1200);
+  };
+
+  return (
+    <div style={{ width: '100%', maxWidth: 390, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Sky + drone */}
+      <div className="sky-bg">
+        <Header/>
+        <SkySceneAnimated/>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: '32px 28px 48px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Overline */}
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#9E8E79', marginBottom: 10 }}>
+          Today's Pie
+        </div>
+
+        {/* Title */}
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 34, fontWeight: 700, color: '#5C3A1E', lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: 12 }}>
+          {tweaks.pieName}
+        </h1>
+
+        {/* Description */}
+        <p style={{ fontSize: 15, color: '#7A6C5A', lineHeight: 1.7, marginBottom: 24 }}>
+          Tart Montmorency cherries, buttery crust, baked this morning. One pie, delivered by drone—
+          <em style={{ color: '#D97D18', fontStyle: 'normal' }}>ASAP</em>.
+        </p>
+
+        {/* Price + detail */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 36, fontWeight: 300, color: '#D97D18', letterSpacing: '-0.02em' }}>{tweaks.price}</span>
+          <span style={{ fontSize: 14, color: '#9E8E79' }}>· serves 4–6 · ~{tweaks.deliveryMin} min</span>
+        </div>
+
+        {/* Status badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#D1F0E2', padding: '5px 12px', borderRadius: 9999, marginBottom: 36, alignSelf: 'flex-start' }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D9E5F' }}/>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#1A6B42' }}>Available now</span>
+        </div>
+
+        {/* CTA */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <OrderButton onClick={handleOrder} loading={ordering}/>
+          <button
+            onClick={onSoldOut}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#BFB09C', fontFamily: "'DM Sans', sans-serif", textDecoration: 'underline' }}
+          >
+            Preview sold-out state
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Animated sky scene ───────────────────────────────────────────
+const SkySceneAnimated = () => {
+  const [t, setT] = React.useState(0);
+  React.useEffect(() => {
+    const id = setInterval(() => setT(p => p + 1), 50);
+    return () => clearInterval(id);
+  }, []);
+  const droneY = Math.sin(t * 0.04) * 7;
+  return <SkyScene droneY={droneY}/>;
+};
+
+// ── Tracking Screen ───────────────────────────────────────────────
+const TrackingScreen = ({ tweaks, onBack }) => (
+  <div style={{ width: '100%', maxWidth: 390, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="sky-bg" style={{ background: 'linear-gradient(180deg, #3DAAE8 0%, #BAE0F9 60%, #FDFAF5 100%)' }}>
+      <Header/>
+      <div style={{ height: 80 }}/>
+    </div>
+    <div style={{ padding: '32px 28px 48px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <StatusPanel onDelivered={onBack}/>
+      <button onClick={onBack} style={{ marginTop: 28, background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#BFB09C', fontFamily: "'DM Sans', sans-serif" }}>
+        ← Back to start
+      </button>
+    </div>
+  </div>
+);
+
+// ── Sold Out Screen ───────────────────────────────────────────────
+const SoldOutScreen = ({ onBack }) => (
+  <div style={{ width: '100%', maxWidth: 390, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="sky-bg" style={{ background: 'linear-gradient(180deg, #EDE4D5 0%, #F7F1E8 60%, #FDFAF5 100%)' }}>
+      <Header/>
+      <div style={{ height: 80 }}/>
+    </div>
+    <div style={{ padding: '32px 28px 48px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <SoldOut/>
+      <button onClick={onBack} style={{ marginTop: 32, background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#BFB09C', fontFamily: "'DM Sans', sans-serif" }}>
+        ← Back to start
+      </button>
+    </div>
+  </div>
+);
+
+// ── App ───────────────────────────────────────────────────────────
+const App = () => {
+  const savedScreen = localStorage.getItem('pits_screen') || TWEAK_DEFAULTS.initialScreen;
+  const [screen, setScreenRaw] = React.useState(savedScreen);
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [tweakOpen, setTweakOpen] = React.useState(false);
+
+  const setScreen = (s) => { localStorage.setItem('pits_screen', s); setScreenRaw(s); };
+
+  // Tweak panel communication
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweakOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweakOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const updateTweak = (key, val) => {
+    const next = { ...tweaks, [key]: val };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
+  };
+
+  return (
+    <>
+      {screen === 'available' && (
+        <AvailableScreen tweaks={tweaks} onOrder={() => setScreen('tracking')} onSoldOut={() => setScreen('soldout')}/>
+      )}
+      {screen === 'tracking' && (
+        <TrackingScreen tweaks={tweaks} onBack={() => setScreen('available')}/>
+      )}
+      {screen === 'soldout' && (
+        <SoldOutScreen onBack={() => setScreen('available')}/>
+      )}
+
+      {/* Tweak panel */}
+      <div className={`tweak-panel ${tweakOpen ? 'visible' : ''}`}>
+        <div className="tweak-title">Tweaks</div>
+
+        <div className="tweak-row">
+          <label className="tweak-label">Starting screen</label>
+          <select value={tweaks.initialScreen} onChange={e => { updateTweak('initialScreen', e.target.value); setScreen(e.target.value); }}>
+            <option value="available">Available</option>
+            <option value="tracking">Tracking</option>
+            <option value="soldout">Sold Out</option>
+          </select>
+        </div>
+
+        <div className="tweak-row">
+          <label className="tweak-label">Pie name</label>
+          <select value={tweaks.pieName} onChange={e => updateTweak('pieName', e.target.value)}>
+            <option value="Signature Cherry Lattice">Signature Cherry Lattice</option>
+            <option value="Bourbon Pecan">Bourbon Pecan</option>
+            <option value="Wild Blueberry">Wild Blueberry</option>
+            <option value="Salted Honey Custard">Salted Honey Custard</option>
+          </select>
+        </div>
+
+        <div className="tweak-row">
+          <label className="tweak-label">Price: {tweaks.price}</label>
+          <select value={tweaks.price} onChange={e => updateTweak('price', e.target.value)}>
+            <option value="$22">$22</option>
+            <option value="$24">$24</option>
+            <option value="$28">$28</option>
+            <option value="$32">$32</option>
+          </select>
+        </div>
+
+        <div className="tweak-row">
+          <label className="tweak-label">ETA: {tweaks.deliveryMin} min</label>
+          <input type="range" min={5} max={30} step={1} value={tweaks.deliveryMin}
+            onChange={e => updateTweak('deliveryMin', Number(e.target.value))}/>
+        </div>
+      </div>
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
