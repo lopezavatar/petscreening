@@ -1,0 +1,36 @@
+{
+  "name": "qa-automation",
+  "version": "1.0.0",
+  "description": "Playwright + TypeScript + Cucumber BDD test automation framework",
+  "private": true,
+  "scripts": {
+    "clean:allure": "rm -rf ../reports/allure-results",
+    "pretest": "npm run clean:allure",
+    "pretest:ui": "npm run clean:allure",
+    "pretest:api": "npm run clean:allure",
+    "pretest:chromium": "npm run clean:allure",
+    "pretest:firefox": "npm run clean:allure",
+    "pretest:webkit": "npm run clean:allure",
+    "pretest:parallel": "npm run clean:allure",
+    "pretest:headed": "npm run clean:allure",
+    "test": "cucumber-js --profile default",
+    "test:ui": "cucumber-js --profile ui",
+    "test:api": "cucumber-js --profile api",
+    "test:chromium": "cucumber-js --profile chromium",
+    "test:firefox": "cucumber-js --profile firefox",
+    "test:webkit": "cucumber-js --profile webkit",
+    "test:parallel": "cucumber-js --profile parallel",
+    "test:headed": "PWHEADLESS=false cucumber-js --profile default",
+    "report:allure": "allure generate ../reports/allure-results --clean -o ../reports/allure-report && allure open ../reports/allure-report",
+    "postinstall": "playwright install"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.8.0",
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.0",
+    "allure-cucumberjs": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
