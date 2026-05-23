@@ -20,18 +20,18 @@ Full CRUD surface for the pie product catalogue. Supports filtering and sorting 
 |---|---|---|---|---|---|
 | FR-PRODUCTS-001 | `GET /api/products` returns `200` and an array of product objects. | P0 | API | `api/products.feature` (FR-PRODUCTS-001) | Not Started |
 | FR-PRODUCTS-002 | Each product object contains `id`, `name`, `description`, `price`, `image`, `category`, `available`, and `popularity`. | P0 | API | `api/products.feature` (FR-PRODUCTS-002) | Not Started |
-| FR-PRODUCTS-003 | `?category=fruit` returns only products whose `category` is `"fruit"`. | P1 | API | `api/products.feature` (FR-PRODUCTS-003 outline) | Not Started |
-| FR-PRODUCTS-004 | `?category=cream` returns only cream products; `?category=savory` only savory; `?category=seasonal` only seasonal. | P1 | API | `api/products.feature` (FR-PRODUCTS-003 outline) | Not Started |
-| FR-PRODUCTS-005 | `?available=true` returns only products where `available` is `true`. | P1 | API | `api/products.feature` (FR-PRODUCTS-005) | Not Started |
-| FR-PRODUCTS-006 | `?available=false` returns only products where `available` is `false`. | P1 | API | `api/products.feature` (FR-PRODUCTS-006) | Not Started |
-| FR-PRODUCTS-007 | `?minPrice=10` returns only products with `price >= 10`. | P1 | API | `api/products.feature` (FR-PRODUCTS-007) | Not Started |
-| FR-PRODUCTS-008 | `?maxPrice=15` returns only products with `price <= 15`. | P1 | API | `api/products.feature` (FR-PRODUCTS-008) | Not Started |
-| FR-PRODUCTS-009 | `?minPrice=10&maxPrice=20` returns only products within that price range. | P1 | API | `api/products.feature` (FR-PRODUCTS-009) | Not Started |
-| FR-PRODUCTS-010 | `?sortBy=price&sortOrder=asc` returns products sorted by price ascending. | P1 | API | `api/products.feature` (FR-PRODUCTS-010) | Not Started |
-| FR-PRODUCTS-011 | `?sortBy=price&sortOrder=desc` returns products sorted by price descending. | P1 | API | `api/products.feature` (FR-PRODUCTS-011) | Not Started |
+| FR-PRODUCTS-003 | `?category=fruit` returns only products whose `category` is `"fruit"`. | P1 | API | `api/products.feature` (FR-PRODUCTS-003 outline) | Implemented |
+| FR-PRODUCTS-004 | `?category=cream` returns only cream products; `?category=savory` only savory; `?category=seasonal` only seasonal. | P1 | API | `api/products.feature` (FR-PRODUCTS-003 outline) | Implemented |
+| FR-PRODUCTS-005 | `?available=true` returns only products where `available` is `true`. | P1 | API | `api/products.feature` (FR-PRODUCTS-005) | Implemented |
+| FR-PRODUCTS-006 | `?available=false` returns only products where `available` is `false`. | P1 | API | `api/products.feature` (FR-PRODUCTS-006) | Implemented |
+| FR-PRODUCTS-007 | `?minPrice=10` returns only products with `price >= 10`. | P1 | API | `api/products.feature` (FR-PRODUCTS-007) | Implemented — test asserts via snapshot, not literal |
+| FR-PRODUCTS-008 | `?maxPrice=15` returns only products with `price <= 15`. | P1 | API | `api/products.feature` (FR-PRODUCTS-008) | Implemented — test asserts via snapshot, not literal |
+| FR-PRODUCTS-009 | `?minPrice=10&maxPrice=20` returns only products within that price range. | P1 | API | `api/products.feature` (FR-PRODUCTS-009) | Implemented — test asserts via snapshot, not literal |
+| FR-PRODUCTS-010 | `?sortBy=price&sortOrder=asc` returns products sorted by price ascending. | P1 | API | `api/products.feature` (FR-PRODUCTS-010) | Implemented |
+| FR-PRODUCTS-011 | `?sortBy=price&sortOrder=desc` returns products sorted by price descending. | P1 | API | `api/products.feature` (FR-PRODUCTS-011) | Implemented |
 | FR-PRODUCTS-012 | `?sortBy=name` returns products sorted alphabetically by name. | P2 | API | `api/products.feature` (FR-PRODUCTS-012) | Not Started |
 | FR-PRODUCTS-013 | `?sortBy=popularity&sortOrder=desc` returns products sorted by popularity descending. | P2 | API | `api/products.feature` (FR-PRODUCTS-013) | Not Started |
-| FR-PRODUCTS-014 | Combined filters (e.g. `?category=fruit&available=true&sortBy=price`) work together correctly. | P1 | API | `api/products.feature` (FR-PRODUCTS-014) | Not Started |
+| FR-PRODUCTS-014 | Combined filters (e.g. `?category=fruit&available=true&sortBy=price`) work together correctly. | P1 | API | `api/products.feature` (FR-PRODUCTS-014) | Implemented |
 
 ## POST /api/products — Create product
 
@@ -80,8 +80,8 @@ Full CRUD surface for the pie product catalogue. Supports filtering and sorting 
 | ID | Description | Priority | Test type | Test Case ID(s) | Status |
 |---|---|---|---|---|---|
 | NFR-PRODUCTS-001 | `GET /api/products` responds in < 300 ms p95 on local environment. | P2 | Performance | `api/products.perf.spec` | Not Started |
-| NFR-PRODUCTS-002 | All endpoints return `Content-Type: application/json`. | P1 | API | `api/products.feature` | Not Started |
-| NFR-PRODUCTS-003 | Seeded database contains at least 12 products across all four categories. | P1 | API | `api/products.feature` (NFR-PRODUCTS-003) | Not Started |
+| NFR-PRODUCTS-002 | All endpoints return `Content-Type: application/json`. | P1 | API | `api/products.feature` | Implemented |
+| NFR-PRODUCTS-003 | Seeded database contains at least 12 products across all four categories. | P1 | API | `api/products.feature` (NFR-PRODUCTS-003) | Implemented |
 
 ## Security
 
