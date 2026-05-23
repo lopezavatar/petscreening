@@ -6,6 +6,8 @@ can verify coverage, traceability and gaps.
 
 ## Scope
 
+### UI Pages
+
 | RTM file | Route | Auth required |
 |---|---|---|
 | [home.rtm.md](home.rtm.md) | `/` | No (guest + authenticated) |
@@ -14,6 +16,18 @@ can verify coverage, traceability and gaps.
 | [confirmation.rtm.md](confirmation.rtm.md) | `/confirmation` | No (last order must exist in session) |
 | [tracking.rtm.md](tracking.rtm.md) | `/tracking/{orderId}` | No |
 | [account.rtm.md](account.rtm.md) | `/account`, `/account/orders`, `/account/rewards` | Yes |
+
+### API Endpoints
+
+| RTM file | Base path | Description |
+|---|---|---|
+| [api/auth.rtm.md](api/auth.rtm.md) | `POST /api/auth` | User authentication |
+| [api/products.rtm.md](api/products.rtm.md) | `/api/products` | Product catalogue CRUD |
+| [api/orders.rtm.md](api/orders.rtm.md) | `/api/orders` | Order management CRUD |
+| [api/users.rtm.md](api/users.rtm.md) | `/api/users` | User management CRUD + points adjustment |
+| [api/promo-codes.rtm.md](api/promo-codes.rtm.md) | `/api/promo-codes` | Promotional codes CRUD |
+| [api/weather.rtm.md](api/weather.rtm.md) | `/api/weather` | Rain status and override control |
+| [api/db-utilities.rtm.md](api/db-utilities.rtm.md) | `/api/db`, `/api/seed` | Dev/test database utilities |
 
 ## Test users (loyalty tiers)
 
