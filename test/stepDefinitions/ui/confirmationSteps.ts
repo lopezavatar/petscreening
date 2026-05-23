@@ -1,19 +1,9 @@
-import { Before, After, Given, When, Then, setDefaultTimeout, World } from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  Page,
-  expect,
-} from '@playwright/test';
-import { PageFactory } from '../../utils/factories/PageFactory';
+import { Before, Given, When, Then } from '@cucumber/cucumber';
+import { Page, expect } from '@playwright/test';
 import { ConfirmationPage } from '../../pages/ConfirmationPage';
 import { AccountPage } from '../../pages/AccountPage';
 import { loginAs, TIER_USER_POINTS, type Tier } from '../../utils/auth';
-
-setDefaultTimeout(30_000);
+import { CustomWorld } from '../../world/CustomWorld';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -65,13 +55,8 @@ interface SeedOrder {
   pointsEarned?: number;
 }
 
-interface ConfirmationWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  factory?: PageFactory;
+interface ConfirmationWorld extends CustomWorld {
   confirmation?: ConfirmationPage;
-  baseUrl?: string;
   /** Seeded order stored on World for cross-step assertions. */
   seededOrder?: SeedOrder;
   /** Initial points of the logged-in user (used by TIER-CONF-003). */
@@ -88,14 +73,6 @@ function pageOf(world: ConfirmationWorld): Page {
 function confirmationPage(world: ConfirmationWorld): ConfirmationPage {
   if (!world.confirmation) throw new Error('ConfirmationPage not initialised');
   return world.confirmation;
-}
-
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox': return firefox;
-    case 'webkit':  return webkit;
-    default:        return chromium;
-  }
 }
 
 /** A minimal synthetic product for order seeding. */
@@ -156,28 +133,13 @@ async function seedOrder(world: ConfirmationWorld, order: SeedOrder): Promise<vo
   );
 }
 
-// ─── Hooks ───────────────────────────────────────────────────────────────────
+// ─── Hooks ───────────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts. Here we build the
+// ConfirmationPage and land on home so sessionStorage is same-origin before seeding.
 
 Before({ tags: '@confirmation' }, async function (this: ConfirmationWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page    = await this.context.newPage();
-  this.factory = new PageFactory(this.page);
-  this.confirmation = this.factory.create('confirmation');
-
-  // Land on home first so sessionStorage is same-origin and available.
-  await this.page.goto(this.baseUrl + '/', { waitUntil: 'networkidle' });
-});
-
-After({ tags: '@confirmation' }, async function (this: ConfirmationWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
-  this.factory?.reset();
+  this.confirmation = this.factory!.create('confirmation');
+  await this.page!.goto(this.baseUrl + '/', { waitUntil: 'networkidle' });
 });
 
 // ─── Given (Arrange) ────────────────────────────────────────────────────────

@@ -32,9 +32,6 @@ export class CheckoutPage extends BasePage {
   cartLine(productName: string): Locator {
     return this.page.getByText(productName, { exact: true }).locator('..').locator('..');
   }
-  decreaseQtyButton(productName: string): Locator {
-    return this.cartLine(productName).getByRole('button', { name: '−' });
-  }
   increaseQtyButton(productName: string): Locator {
     return this.cartLine(productName).getByRole('button', { name: '+' });
   }

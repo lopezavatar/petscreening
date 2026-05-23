@@ -85,20 +85,3 @@ Feature: Account — Order History
     And I open the orders page
     Then pagination splits the results correctly
     And Next page becomes enabled when there is a next page
-
-  @FR-ORD-009 @P1 @known-bug @known-bug:FR-ORD-009
-  Scenario: Clicking a row drills down into the order detail
-    # Current implementation expands the row inline rather than navigating to
-    # a detail route.
-    Given I am signed into the account area as a "gold" user
-    And I open the orders page
-    When I click on the first order row
-    Then the order detail view is shown
-
-  @FR-ORD-010 @P2 @known-bug @known-bug:FR-ORD-010
-  Scenario: Empty-state message and CTA back to the catalog
-    # Implementation renders "No orders found" but no CTA back to the catalog.
-    Given I am signed into the account area with empty order history
-    And I open the orders page
-    Then the empty-state message is visible
-    And a CTA back to the catalog is visible

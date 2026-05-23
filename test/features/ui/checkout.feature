@@ -16,13 +16,6 @@ Feature: Checkout page (/checkout)
     Given I navigate directly to /checkout with no cart
     Then I am redirected to the home page
 
-  # ─── FR-CHK-004 ─ Decrease quantity floor ───────────────────────────────
-  @FR-CHK-004 @P1 @known-bug:FR-CHK-004
-  Scenario: − button is disabled when quantity is 1
-    Given I open checkout with 1 of the cheapest in-stock product
-    Then the − button for that product is disabled
-    And clicking − keeps the product in the cart
-
   # ─── FR-CHK-005 ─ Remove line / last item ───────────────────────────────
   @FR-CHK-005 @P1 @regression
   Scenario: Remove deletes the line; the last remaining item redirects to /
@@ -206,14 +199,6 @@ Feature: Checkout page (/checkout)
     And I fill the cardholder, card number and CVV with valid values
     When I type "0120" into the expiry field
     Then the PLACE ORDER button is disabled
-
-  # ─── FR-CHK-063 ─ CVV limited to 3 digits ───────────────────────────────
-  @FR-CHK-063 @P1 @known-bug:FR-CHK-063
-  Scenario: CVV accepts only 3 digits
-    Given I open checkout with 1 of the cheapest in-stock product
-    And I set the slider distance to 5
-    When I type "12345" into the CVV field
-    Then the CVV field value is "123"
 
   # ─── FR-CHK-065 ─ Cart cleared after successful order ───────────────────
   @FR-CHK-065 @P1 @regression

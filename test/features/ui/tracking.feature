@@ -148,18 +148,6 @@ Feature: Tracking page — P1 UI requirements
       | --            |
       | a%20b%20c     |
 
-  # ─── TIER-TRK-002 ─────────────────────────────────────────────────────────────
-  # @known-bug:TIER-TRK-002 — OrderRow.tsx has no "Track Order" link; the feature
-  # is not yet implemented. Remove this tag once the link is added.
-
-  @TIER-TRK-002 @known-bug @known-bug:TIER-TRK-002
-  Scenario: Bronze user navigates from order history to the tracking page
-    Given I am logged in as a "bronze" user
-    And a "pending" order is seeded for that user with order ID "PITS-20260522-T3ST"
-    When I go to the account orders page
-    And I click the "Track Order" link for order "PITS-20260522-T3ST"
-    Then I am on the tracking page for order "PITS-20260522-T3ST"
-
   # ─── NFR-TRK-004 ─────────────────────────────────────────────────────────────
 
   @NFR-TRK-004

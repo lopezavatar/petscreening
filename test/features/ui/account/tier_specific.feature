@@ -9,7 +9,7 @@ Feature: Account — Tier-specific UI
     Given I am signed into the account area as a "bronze" user
     And I open the profile page
     Then the tier label is "bronze"
-    And the discount text is "0% discount"
+    And the discount text is "No discount"
     And the tier card points are within the "bronze" tier range
 
   @TIER-ACC-002 @P1

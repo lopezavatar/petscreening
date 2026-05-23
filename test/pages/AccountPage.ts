@@ -201,10 +201,7 @@ export class AccountPage extends BasePage {
   pageNumberButton(n: number): Locator {
     return this.page.getByRole('button', { name: `Page ${n}` });
   }
-  /** Empty-state message. */
-  get ordersEmptyState(): Locator {
-    return this.page.getByText(/No orders found/i);
-  }
+
 
   // ─── Rewards ──────────────────────────────────────────────────────────────
   get rewardsCatalogHeading(): Locator {

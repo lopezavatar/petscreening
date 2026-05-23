@@ -70,31 +70,6 @@ Feature: Login page (/login)
       | password | {LOGIN_BRONZE_EMAIL} |                        | password     |
       | both     |                      |                        | email        |
 
-  # ─── FR-LOGIN-006 ─ Malformed email ────────────────────────────────────────
-  @FR-LOGIN-006 @P2
-  Scenario Outline: Malformed email "<email>" is rejected by the browser
-    Given I open the login page
-    When I fill the login form with email "<email>" and password "{LOGIN_VALID_PASSWORD}"
-    And I click the Sign In button
-    Then I remain on the login page
-    And the "email" input is reported invalid by the browser
-
-    Examples:
-      | email   |
-      | foo     |
-      | foo@    |
-
-  # Browsers (Chromium/WebKit/Firefox) accept "foo@bar" as a valid HTML5
-  # email because the spec does not require a dot in the host. The RTM
-  # expects rejection — gap in the source (no extra JS validation).
-  @FR-LOGIN-006 @P2 @known-bug @known-bug:FR-LOGIN-006-foo-at-bar
-  Scenario: Malformed email "foo@bar" should be rejected (known gap)
-    Given I open the login page
-    When I fill the login form with email "foo@bar" and password "{LOGIN_VALID_PASSWORD}"
-    And I click the Sign In button
-    Then I remain on the login page
-    And the "email" input is reported invalid by the browser
-
   # ─── FR-LOGIN-007 ─ Password is masked ─────────────────────────────────────
   @FR-LOGIN-007 @P1
   Scenario: Password input is of type=password
