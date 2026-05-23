@@ -6,16 +6,12 @@
   "scripts": {
     "clean:allure": "rm -rf ../reports/allure-results",
     "pretest": "npm run clean:allure",
-    "pretest:ui": "npm run clean:allure",
-    "pretest:api": "npm run clean:allure",
-    "pretest:chromium": "npm run clean:allure",
-    "pretest:firefox": "npm run clean:allure",
-    "pretest:webkit": "npm run clean:allure",
-    "pretest:parallel": "npm run clean:allure",
-    "pretest:headed": "npm run clean:allure",
     "test": "cucumber-js --profile default",
     "test:ui": "cucumber-js --profile ui",
     "test:api": "cucumber-js --profile api",
+    "test:ai": "AI_ISSUE_CREATION=true cucumber-js --profile default",
+    "test:ai:ui": "AI_ISSUE_CREATION=true cucumber-js --profile ui",
+    "test:ai:api": "AI_ISSUE_CREATION=true cucumber-js --profile api",
     "test:chromium": "cucumber-js --profile chromium",
     "test:firefox": "cucumber-js --profile firefox",
     "test:webkit": "cucumber-js --profile webkit",
@@ -26,10 +22,12 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^10.8.0",
+    "@octokit/rest": "^22.0.1",
     "@playwright/test": "^1.44.0",
     "@types/node": "^20.12.0",
     "allure-cucumberjs": "^3.0.0",
     "dotenv": "^16.4.5",
+    "openai": "^6.39.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }

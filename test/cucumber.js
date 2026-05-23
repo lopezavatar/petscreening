@@ -11,23 +11,15 @@ const ALLURE_RESULTS_DIR = path.resolve(__dirname, '../reports/allure-results');
  * Output dirs are relative to the *project root* (one level up from test/).
  */
 
-const COMMON_OPTIONS = [
-  '--require-module ts-node/register',
-  '--require stepDefinitions/**/*.ts',
-  '--require fixtures/**/*.ts',
-  '--format progress',
-  '--format allure-cucumberjs/reporter',
-  '--format html:../reports/cucumber-report.html',
-  '--format json:../reports/cucumber-report.json',
-  '--publish-quiet',
-].join(' ');
+// AI failure analysis hook — loaded in every profile so it runs after each scenario
+const AI_HOOK = 'hooks/**/*.ts';
 
 module.exports = {
   /** Run all feature files with Chromium (default) */
   default: {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     format: [
       'progress',
       'allure-cucumberjs/reporter',
@@ -42,7 +34,7 @@ module.exports = {
   ui: {
     paths: ['features/ui/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/ui/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/ui/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     format: [
       'progress',
       'html:../reports/cucumber-ui-report.html',
@@ -54,7 +46,7 @@ module.exports = {
   api: {
     paths: ['features/api/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/api/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/api/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     format: [
       'progress',
       'html:../reports/cucumber-api-report.html',
@@ -66,7 +58,7 @@ module.exports = {
   parallel: {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     parallel: 4,
     format: [
       'progress',
@@ -79,7 +71,7 @@ module.exports = {
   chromium: {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     worldParameters: { browser: 'chromium' },
     format: ['progress', 'html:../reports/cucumber-chromium-report.html'],
     publishQuiet: true,
@@ -88,7 +80,7 @@ module.exports = {
   firefox: {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     worldParameters: { browser: 'firefox' },
     format: ['progress', 'html:../reports/cucumber-firefox-report.html'],
     publishQuiet: true,
@@ -97,7 +89,7 @@ module.exports = {
   webkit: {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
-    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts'],
+    require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
     worldParameters: { browser: 'webkit' },
     format: ['progress', 'html:../reports/cucumber-webkit-report.html'],
     publishQuiet: true,
