@@ -1,27 +1,8 @@
-import {
-  Before,
-  After,
-  Given,
-  When,
-  Then,
-  DataTable,
-  setDefaultTimeout,
-  World,
-} from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  Page,
-  expect,
-} from '@playwright/test';
+import { Before, Given, When, Then, DataTable } from '@cucumber/cucumber';
+import { Page, expect } from '@playwright/test';
 import { PageFactory } from '../../utils/factories/PageFactory';
 import { TrackingPage } from '../../pages/TrackingPage';
-import { loginAs, type Tier } from '../../utils/auth';
-
-setDefaultTimeout(30_000);
+import { CustomWorld } from '../../world/CustomWorld';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -71,19 +52,12 @@ interface SeedOrder {
   userId?: string;
 }
 
-interface TrackingWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  factory?: PageFactory;
+interface TrackingWorld extends CustomWorld {
   tracking?: TrackingPage;
-  baseUrl?: string;
   /** The order seeded for the current scenario. */
   seededOrder?: SeedOrder;
   /** ETA captured mid-scenario for assertion in a later step. */
   capturedEta?: number;
-  /** Console errors collected during the scenario. */
-  consoleErrors?: string[];
   /** When true, the Playwright clock has been installed and the navigate step
    *  should fast-forward time to the end of the delivery simulation. */
   clockInstalled?: boolean;
@@ -101,14 +75,6 @@ function pageOf(world: TrackingWorld): Page {
 function trackingPage(world: TrackingWorld): TrackingPage {
   if (!world.tracking) throw new Error('TrackingPage not initialised');
   return world.tracking;
-}
-
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox': return firefox;
-    case 'webkit':  return webkit;
-    default:        return chromium;
-  }
 }
 
 function syntheticProduct(name: string, price = 22.00): SeedProduct {
@@ -178,35 +144,13 @@ function parseEtaMinutes(text: string): number {
 }
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts.
+// This hook only adds domain-specific setup: build the page object and land
+// on the home page so sessionStorage is same-origin before seeding.
 
 Before({ tags: '@tracking' }, async function (this: TrackingWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page    = await this.context.newPage();
-  this.factory = new PageFactory(this.page);
-  this.tracking = this.factory.create('tracking');
-  this.consoleErrors = [];
-
-  // Collect console errors for assertions in malformed_id / no_console_errors tests.
-  this.page.on('console', (msg) => {
-    if (msg.type() === 'error') {
-      this.consoleErrors!.push(msg.text());
-    }
-  });
-
-  // Land on home first so sessionStorage is same-origin.
-  await this.page.goto(this.baseUrl + '/', { waitUntil: 'networkidle' });
-});
-
-After({ tags: '@tracking' }, async function (this: TrackingWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
-  this.factory?.reset();
+  this.tracking = this.factory!.create('tracking');
+  await this.page!.goto(this.baseUrl + '/', { waitUntil: 'networkidle' });
 });
 
 // ─── Given (Arrange) ─────────────────────────────────────────────────────────
@@ -288,27 +232,13 @@ Given(
     });
     this.page    = await this.context.newPage();
     this.factory = new PageFactory(this.page);
-    this.tracking = this.factory.create('tracking');
+    this.tracking = this.factory!.create('tracking');
 
     // Re-seed: same origin navigation required first.
     await this.page.goto(this.baseUrl + '/', { waitUntil: 'networkidle' });
     if (this.seededOrder) {
       await seedOrder(this, this.seededOrder);
     }
-  },
-);
-
-Given(
-  'I am logged in as a {string} user',
-  async function (this: TrackingWorld, tier: string) {
-    await loginAs(this.page!, tier as Tier, this.baseUrl!);
-  },
-);
-
-Given(
-  'a {string} order is seeded for that user with order ID {string}',
-  async function (this: TrackingWorld, status: string, orderId: string) {
-    await seedOrder(this, buildOrder({ orderId, status }));
   },
 );
 
@@ -350,20 +280,6 @@ When('I note the current estimated arrival time', async function (this: Tracking
 When('I wait {int} seconds for delivery progress to advance', async function (this: TrackingWorld, seconds: number) {
   await pageOf(this).waitForTimeout(seconds * 1_000);
 });
-
-When('I go to the account orders page', async function (this: TrackingWorld) {
-  await pageOf(this).goto(this.baseUrl! + '/account/orders', { waitUntil: 'networkidle' });
-});
-
-When(
-  'I click the "Track Order" link for order {string}',
-  async function (this: TrackingWorld, orderId: string) {
-    // The Track Order link is expected to navigate to /tracking/{orderId}.
-    // If the link does not exist, this step will fail and surface the missing feature.
-    await pageOf(this).getByRole('link', { name: /track order/i }).first().click();
-    await pageOf(this).waitForLoadState('networkidle');
-  },
-);
 
 // ─── Then (Assert) ───────────────────────────────────────────────────────────
 
@@ -468,14 +384,6 @@ Then('I am on the home page', async function (this: TrackingWorld) {
   await pageOf(this).waitForURL(/\/$/, { timeout: 10_000 });
   expect(pageOf(this).url()).toMatch(/\/$/);
 });
-
-Then(
-  'I am on the tracking page for order {string}',
-  async function (this: TrackingWorld, orderId: string) {
-    await pageOf(this).waitForURL(new RegExp(`/tracking/${orderId}`), { timeout: 10_000 });
-    expect(pageOf(this).url()).toContain(`/tracking/${orderId}`);
-  },
-);
 
 Then('no console error occurs', async function (this: TrackingWorld) {
   expect(this.consoleErrors).toEqual([]);

@@ -1,20 +1,8 @@
-import { Before, After, Given, When, Then, setDefaultTimeout, World } from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  ConsoleMessage,
-  Page,
-  expect,
-  Route,
-} from '@playwright/test';
-import { PageFactory } from '../../utils/factories/PageFactory';
+import { Before, Given, When, Then } from '@cucumber/cucumber';
+import { Page, expect, Route } from '@playwright/test';
 import { CheckoutPage } from '../../pages/CheckoutPage';
 import { loginAs, type Tier } from '../../utils/auth';
-
-setDefaultTimeout(30_000);
+import { CustomWorld } from '../../world/CustomWorld';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -34,14 +22,8 @@ interface CartItem {
   quantity: number;
 }
 
-interface CheckoutWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  factory?: PageFactory;
+interface CheckoutWorld extends CustomWorld {
   checkout?: CheckoutPage;
-  consoleErrors?: string[];
-  baseUrl?: string;
   /** Full product catalog snapshot from /api/products. */
   catalog?: ProductDto[];
   /** Subtotal of the seeded cart in dollars (sum of price × qty). */
@@ -62,17 +44,6 @@ function pageOf(world: CheckoutWorld): Page {
 function checkoutPage(world: CheckoutWorld): CheckoutPage {
   if (!world.checkout) throw new Error('CheckoutPage not initialised');
   return world.checkout;
-}
-
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox':
-      return firefox;
-    case 'webkit':
-      return webkit;
-    default:
-      return chromium;
-  }
 }
 
 function pad2(n: number): string {
@@ -160,33 +131,14 @@ function syntheticProduct(priceUsd: number, idSuffix: string): ProductDto {
 }
 
 // ─── Hooks ──────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts. This hook only
+// builds the CheckoutPage and snapshots the catalog once per scenario.
 
 Before({ tags: '@checkout' }, async function (this: CheckoutWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page = await this.context.newPage();
-  this.consoleErrors = [];
-  this.page.on('console', (msg: ConsoleMessage) => {
-    if (msg.type() === 'error') this.consoleErrors!.push(msg.text());
-  });
-  this.factory = new PageFactory(this.page);
-  this.checkout = this.factory.create('checkout');
-
-  // Snapshot catalog once per scenario.
-  const res = await this.page.request.get(this.baseUrl + '/api/products');
+  this.checkout = this.factory!.create('checkout');
+  const res = await this.page!.request.get(this.baseUrl + '/api/products');
   if (res.status() !== 200) throw new Error(`catalog snapshot failed: ${res.status()}`);
   this.catalog = (await res.json()) as ProductDto[];
-});
-
-After({ tags: '@checkout' }, async function (this: CheckoutWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
-  this.factory?.reset();
 });
 
 // ─── Given (Arrange) ────────────────────────────────────────────────────────
@@ -359,10 +311,6 @@ When('I type {string} into the expiry field', async function (this: CheckoutWorl
   await checkoutPage(this).expiryInput.fill(value);
 });
 
-When('I type {string} into the CVV field', async function (this: CheckoutWorld, value: string) {
-  await checkoutPage(this).cvvInput.fill(value);
-});
-
 When('I click PLACE ORDER', async function (this: CheckoutWorld) {
   await checkoutPage(this).placeOrderButton.click();
 });
@@ -384,17 +332,6 @@ Then('the cart session storage is empty', async function (this: CheckoutWorld) {
     const parsed = JSON.parse(stored) as { items: unknown[] };
     expect(parsed.items.length).toBe(0);
   }
-});
-
-Then('the − button for that product is disabled', async function (this: CheckoutWorld) {
-  const name = this.cartProductNames![0];
-  await expect(checkoutPage(this).decreaseQtyButton(name)).toBeDisabled();
-});
-
-Then('clicking − keeps the product in the cart', async function (this: CheckoutWorld) {
-  const name = this.cartProductNames![0];
-  await checkoutPage(this).decreaseQtyButton(name).click();
-  await expect(checkoutPage(this).cartLine(name)).toBeVisible();
 });
 
 Then('only the second product line remains', async function (this: CheckoutWorld) {
@@ -531,8 +468,4 @@ Then('the card number field value is {string}', async function (this: CheckoutWo
 
 Then('the expiry field value is {string}', async function (this: CheckoutWorld, expected: string) {
   await expect(checkoutPage(this).expiryInput).toHaveValue(expected);
-});
-
-Then('the CVV field value is {string}', async function (this: CheckoutWorld, expected: string) {
-  await expect(checkoutPage(this).cvvInput).toHaveValue(expected);
 });

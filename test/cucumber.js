@@ -20,6 +20,7 @@ module.exports = {
     paths: ['features/**/*.feature'],
     requireModule: ['ts-node/register'],
     require: ['stepDefinitions/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
+    parallel: 3,
     format: [
       'progress',
       'allure-cucumberjs/reporter',
@@ -35,6 +36,7 @@ module.exports = {
     paths: ['features/ui/**/*.feature'],
     requireModule: ['ts-node/register'],
     require: ['stepDefinitions/ui/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
+    parallel: 3,
     format: [
       'progress',
       'html:../reports/cucumber-ui-report.html',
@@ -47,6 +49,7 @@ module.exports = {
     paths: ['features/api/**/*.feature'],
     requireModule: ['ts-node/register'],
     require: ['stepDefinitions/api/**/*.ts', 'fixtures/**/*.ts', AI_HOOK],
+    parallel: 3,
     format: [
       'progress',
       'html:../reports/cucumber-api-report.html',

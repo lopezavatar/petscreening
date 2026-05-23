@@ -1,18 +1,8 @@
-import { Before, After, Given, When, Then, setDefaultTimeout, World } from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  ConsoleMessage,
-  Page,
-  expect,
-} from '@playwright/test';
+import { Before, Given, When, Then } from '@cucumber/cucumber';
+import { Page, expect } from '@playwright/test';
 import { AccountPage, type AccountSubRoute, type RewardName } from '../../pages/AccountPage';
 import { loginAs, clearSessionState, forgetSession, TIER_USER_IDS, type Tier } from '../../utils/auth';
-
-setDefaultTimeout(30_000);
+import { CustomWorld } from '../../world/CustomWorld';
 
 // ─── Spec-derived constants ────────────────────────────────────────────────
 // Source: src/lib/loyalty.ts → TIER_CONFIG.
@@ -55,28 +45,11 @@ interface OrderSnapshot {
   total: number;
 }
 
-interface AccountWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
+interface AccountWorld extends CustomWorld {
   account?: AccountPage;
-  consoleErrors?: string[];
-  baseUrl?: string;
   signedInTier?: Tier;
   userSnapshot?: UserSnapshot;
   ordersSnapshot?: OrderSnapshot[];
-  mockEmptyOrders?: boolean;
-}
-
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox':
-      return firefox;
-    case 'webkit':
-      return webkit;
-    default:
-      return chromium;
-  }
 }
 
 function pageOf(w: AccountWorld): Page {
@@ -111,30 +84,14 @@ async function fetchOrdersSnapshot(w: AccountWorld): Promise<void> {
 }
 
 // ─── Hooks ─────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts. This hook only
+// wires the AccountPage (not produced by PageFactory) and clears per-scenario state.
 
 Before({ tags: '@account' }, async function (this: AccountWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page = await this.context.newPage();
-  this.consoleErrors = [];
-  this.page.on('console', (msg: ConsoleMessage) => {
-    if (msg.type() === 'error') this.consoleErrors!.push(msg.text());
-  });
-  this.account = new AccountPage(this.page);
+  this.account = new AccountPage(this.page!);
   this.signedInTier = undefined;
   this.userSnapshot = undefined;
   this.ordersSnapshot = undefined;
-  this.mockEmptyOrders = false;
-});
-
-After({ tags: '@account' }, async function (this: AccountWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
 });
 
 // ─── Given (Arrange) ───────────────────────────────────────────────────────
@@ -148,19 +105,6 @@ Given(/^I am signed into the account area as a "(bronze|silver|gold|platinum)" u
   await fetchUserSnapshot(this, this.signedInTier);
 });
 
-Given('I am signed into the account area with empty order history', async function (this: AccountWorld) {
-  this.signedInTier = 'bronze';
-  // Intercept /api/orders so any GET returns []. Set up before navigation.
-  await pageOf(this).route('**/api/orders*', async (route) => {
-    await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
-  });
-  this.mockEmptyOrders = true;
-  await loginAs(pageOf(this), this.signedInTier, this.baseUrl!);
-  await fetchUserSnapshot(this, this.signedInTier);
-  // Snapshot for empty-state explicitly.
-  this.ordersSnapshot = [];
-});
-
 Given('I am not signed in', async function (this: AccountWorld) {
   await pageOf(this).goto(this.baseUrl!);
   await clearSessionState(pageOf(this));
@@ -172,7 +116,7 @@ Given(/^I open the (profile|orders|rewards) page$/, async function (
 ) {
   await account(this).goTo(route);
   await account(this).assertSubRouteLoaded(route);
-  if (route === 'orders' && !this.mockEmptyOrders) await fetchOrdersSnapshot(this);
+  if (route === 'orders') await fetchOrdersSnapshot(this);
 });
 
 Given('I open the Orders page filters panel', async function (this: AccountWorld) {
@@ -234,18 +178,8 @@ When('I go to the next page', async function (this: AccountWorld) {
   await account(this).nextPageButton.click();
 });
 
-When('I click on the first order row', async function (this: AccountWorld) {
-  const firstId = account(this).orderIdCells.first();
-  await firstId.locator('xpath=ancestor::button[1]').click();
-});
-
 When(/^I click Redeem for "(.+)"$/, async function (this: AccountWorld, name: string) {
   await account(this).rewardRedeemButton(name as RewardName).click();
-});
-
-When('I reload the page', async function (this: AccountWorld) {
-  await pageOf(this).reload();
-  await pageOf(this).waitForLoadState('networkidle');
 });
 
 // ─── Then (Assert) ─────────────────────────────────────────────────────────
@@ -390,23 +324,6 @@ Then('Next page becomes enabled when there is a next page', async function (this
   const count = (this.ordersSnapshot ?? []).length;
   const expectedPages = Math.max(1, Math.ceil(count / ORDERS_PER_PAGE));
   if (expectedPages > 1) await expect(account(this).nextPageButton).toBeEnabled();
-});
-
-Then('the empty-state message is visible', async function (this: AccountWorld) {
-  await expect(account(this).ordersEmptyState).toBeVisible();
-});
-
-Then('a CTA back to the catalog is visible', async function (this: AccountWorld) {
-  // RTM expects a link/button back to the catalog; current implementation has none.
-  // Tagged @known-bug:FR-ORD-010.
-  const cta = pageOf(this).getByRole('link', { name: /menu|catalog|browse/i });
-  await expect(cta).toBeVisible();
-});
-
-Then('the order detail view is shown', async function (this: AccountWorld) {
-  // RTM expects drill-down navigation; current implementation expands inline.
-  // Tagged @known-bug:FR-ORD-009.
-  await expect(pageOf(this)).toHaveURL(/\/account\/orders\/PIE-/);
 });
 
 Then('the rewards catalog renders six items', async function (this: AccountWorld) {

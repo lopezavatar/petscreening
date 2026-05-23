@@ -1,38 +1,10 @@
-import { Before, After, Given, When, Then, setDefaultTimeout, World } from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  ConsoleMessage,
-  Page,
-  expect,
-} from '@playwright/test';
-import { PageFactory } from '../../utils/factories/PageFactory';
+import { Before, Given, When, Then } from '@cucumber/cucumber';
+import { Page, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
+import { CustomWorld } from '../../world/CustomWorld';
 
-setDefaultTimeout(30_000);
-
-interface LoginWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  factory?: PageFactory;
+interface LoginWorld extends CustomWorld {
   login?: LoginPage;
-  baseUrl?: string;
-  consoleErrors?: string[];
-}
-
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox':
-      return firefox;
-    case 'webkit':
-      return webkit;
-    default:
-      return chromium;
-  }
 }
 
 function loginPage(w: LoginWorld): LoginPage {
@@ -93,28 +65,11 @@ async function fetchUserForTier(world: LoginWorld, tier: Tier) {
 }
 
 // ─── Hooks ──────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts. We only need to
+// build the LoginPage from the shared factory.
 
 Before({ tags: '@login' }, async function (this: LoginWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page = await this.context.newPage();
-  this.consoleErrors = [];
-  this.page.on('console', (msg: ConsoleMessage) => {
-    if (msg.type() === 'error') this.consoleErrors!.push(msg.text());
-  });
-  this.factory = new PageFactory(this.page);
-  this.login = this.factory.create('login');
-});
-
-After({ tags: '@login' }, async function (this: LoginWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
-  this.factory?.reset();
+  this.login = this.factory!.create('login');
 });
 
 // ─── Given (Arrange) ────────────────────────────────────────────────────────

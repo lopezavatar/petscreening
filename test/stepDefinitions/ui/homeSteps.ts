@@ -1,19 +1,8 @@
-import { Before, After, Given, When, Then, setDefaultTimeout, World } from '@cucumber/cucumber';
-import {
-  chromium,
-  firefox,
-  webkit,
-  Browser,
-  BrowserContext,
-  ConsoleMessage,
-  Page,
-  expect,
-} from '@playwright/test';
-import { PageFactory } from '../../utils/factories/PageFactory';
+import { Before, Given, When, Then } from '@cucumber/cucumber';
+import { Page, expect } from '@playwright/test';
 import { HomePage, type SortLabel, type CategoryLabel } from '../../pages/HomePage';
 import { loginAs, type Tier } from '../../utils/auth';
-
-setDefaultTimeout(30_000);
+import { CustomWorld } from '../../world/CustomWorld';
 
 // ─── Test-scoped state ───────────────────────────────────────────────────────
 
@@ -37,15 +26,9 @@ interface CatalogSnapshot {
   maxPrice: number;
 }
 
-interface HomeWorld extends World {
-  browser?: Browser;
-  context?: BrowserContext;
-  page?: Page;
-  factory?: PageFactory;
+interface HomeWorld extends CustomWorld {
   home?: HomePage;
-  consoleErrors?: string[];
   signedInTier?: Tier;
-  baseUrl?: string;
   catalog?: CatalogSnapshot;
   /** Unique products picked at runtime for "first/second in-stock" steps. */
   pickedProducts?: ProductDto[];
@@ -69,40 +52,19 @@ function pickInStock(world: HomeWorld, index: number): ProductDto {
   return p;
 }
 
-function launcher(name?: string) {
-  switch (name) {
-    case 'firefox':
-      return firefox;
-    case 'webkit':
-      return webkit;
-    default:
-      return chromium;
-  }
-}
-
 // ─── Hooks ──────────────────────────────────────────────────────────────────
+// Shared browser launch/close lives in hooks/browserHook.ts. This hook builds
+// the HomePage, resets per-scenario state and snapshots the catalog so tests
+// stay data-agnostic.
 
 Before({ tags: '@home' }, async function (this: HomeWorld) {
-  const browserName = (this.parameters as { browser?: string } | undefined)?.browser;
-  this.baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
-  this.browser = await launcher(browserName).launch({
-    headless: process.env.PWHEADLESS !== 'false',
-  });
-  this.context = await this.browser.newContext({ baseURL: this.baseUrl });
-  this.page = await this.context.newPage();
-  this.consoleErrors = [];
-  this.page.on('console', (msg: ConsoleMessage) => {
-    if (msg.type() === 'error') this.consoleErrors!.push(msg.text());
-  });
-  this.factory = new PageFactory(this.page);
-  this.home = this.factory.create('home');
+  this.home = this.factory!.create('home');
   this.signedInTier = undefined;
   this.pickedProducts = [];
   this.cartAdditions = [];
   this.activeCategory = undefined;
 
-  // Snapshot the catalog once per scenario so tests stay data-agnostic.
-  const res = await this.page.request.get(this.baseUrl + '/api/products');
+  const res = await this.page!.request.get(this.baseUrl + '/api/products');
   if (res.status() !== 200) throw new Error(`catalog snapshot fetch failed: ${res.status()}`);
   const products = (await res.json()) as ProductDto[];
   const available = products.filter((p) => p.available);
@@ -120,13 +82,6 @@ Before({ tags: '@home' }, async function (this: HomeWorld) {
     minPrice: Math.min(...products.map((p) => p.price)),
     maxPrice: Math.max(...products.map((p) => p.price)),
   };
-});
-
-After({ tags: '@home' }, async function (this: HomeWorld) {
-  await this.page?.close().catch(() => undefined);
-  await this.context?.close().catch(() => undefined);
-  await this.browser?.close().catch(() => undefined);
-  this.factory?.reset();
 });
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
