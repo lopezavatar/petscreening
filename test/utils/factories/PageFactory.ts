@@ -1,12 +1,16 @@
 import { Page } from '@playwright/test';
 import { BasePage } from '../../pages/BasePage';
 import { HomePage } from '../../pages/HomePage';
+import { LoginPage } from '../../pages/LoginPage';
+import { CheckoutPage } from '../../pages/CheckoutPage';
+import { ConfirmationPage } from '../../pages/ConfirmationPage';
+import { TrackingPage } from '../../pages/TrackingPage';
 
 /**
  * PageType — union of all registered page keys.
  * Add new pages here as the project grows.
  */
-export type PageType = 'home';
+export type PageType = 'home' | 'login' | 'checkout' | 'confirmation' | 'tracking';
 
 /**
  * PageFactory — Factory pattern for page object instantiation.
@@ -34,6 +38,10 @@ export class PageFactory {
    * Instantiates on first call, then returns the same instance.
    */
   create(type: 'home'): HomePage;
+  create(type: 'login'): LoginPage;
+  create(type: 'checkout'): CheckoutPage;
+  create(type: 'confirmation'): ConfirmationPage;
+  create(type: 'tracking'): TrackingPage;
   create(type: PageType): BasePage;
   create(type: PageType): BasePage {
     if (this.cache.has(type)) {
@@ -54,8 +62,16 @@ export class PageFactory {
 
   private instantiate(type: PageType): BasePage {
     switch (type) {
+      case 'checkout':
+        return new CheckoutPage(this.page);
+      case 'confirmation':
+        return new ConfirmationPage(this.page);
+      case 'tracking':
+        return new TrackingPage(this.page);
       case 'home':
         return new HomePage(this.page);
+      case 'login':
+        return new LoginPage(this.page);
       default:
         throw new Error(`PageFactory: unknown page type "${type}"`);
     }
