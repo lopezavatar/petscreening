@@ -2,7 +2,7 @@
 
 This folder contains the Playwright + TypeScript + Cucumber BDD test automation framework for Pie in the Sky.
 
-The current automation framework was developed with the help of AI.
+The current automation framework was partially developed with the help of AI.
 My process to develop this application was:
 
 Initially I did some exploratory testing on the application to understand how it works, which modules are available and which apis exits.
