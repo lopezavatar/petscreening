@@ -214,7 +214,7 @@ Then('the sidebar shows my tier and points', async function (this: AccountWorld)
   const u = userSnap(this);
   await expect(account(this).sidebarTierBadge).toHaveText(u.tier);
   await expect(account(this).sidebarPointsBadge).toHaveText(
-    `${u.points.toLocaleString()} pts`,
+    `${u.points.toLocaleString('en-US')} pts`,
   );
 });
 
@@ -235,7 +235,7 @@ Then('the tier card discount matches my tier', async function (this: AccountWorl
 
 Then('the tier card points equal my snapshot points', async function (this: AccountWorld) {
   const u = userSnap(this);
-  await expect(account(this).tierCardPoints).toHaveText(u.points.toLocaleString());
+  await expect(account(this).tierCardPoints).toHaveText(u.points.toLocaleString('en-US'));
 });
 
 Then('the progress label targets the next tier', async function (this: AccountWorld) {
@@ -333,7 +333,7 @@ Then('the rewards catalog renders six items', async function (this: AccountWorld
 Then('the points available header matches my points', async function (this: AccountWorld) {
   const u = userSnap(this);
   await expect(account(this).pointsAvailableHeader).toHaveText(
-    `${u.points.toLocaleString()} points available`,
+    `${u.points.toLocaleString('en-US')} points available`,
   );
 });
 
@@ -382,7 +382,7 @@ Then(
 Then('the points balance decreased by {int}', async function (this: AccountWorld, cost: number) {
   const before = userSnap(this).points;
   await expect(account(this).pointsAvailableHeader).toHaveText(
-    `${(before - cost).toLocaleString()} points available`,
+    `${(before - cost).toLocaleString('en-US')} points available`,
   );
 });
 
