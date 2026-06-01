@@ -1,7 +1,16 @@
 import { After, ITestCaseHookParameter } from '@cucumber/cucumber';
+import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { analyzeFailure } from '../utils/aiAnalyzer';
 import { createOrFindIssue } from '../utils/githubIssueCreator';
+
+const ENV = process.env.TEST_ENV ?? 'dev';
+dotenv.config({ path: path.resolve(__dirname, `../resources/env/.env.${ENV}`) });
+
+function isEnabled(value: string | undefined): boolean {
+  if (!value) return false;
+  return /^(true|1|yes|on)$/i.test(value.trim());
+}
 
 /**
  * failureAnalysisHook — runs after every scenario.
@@ -24,11 +33,20 @@ import { createOrFindIssue } from '../utils/githubIssueCreator';
  *   AI_MODEL            — defaults to "gpt-4o-mini"
  */
 After(async function (this: any, { result, pickle, gherkinDocument }: ITestCaseHookParameter) {
+  if (!result) return;
+
   // Only process failed scenarios
-  if (result?.status !== 'FAILED') return;
+  const status = String(result.status ?? '').toUpperCase();
+  if (status !== 'FAILED') return;
 
   // Feature flag — opt-in to avoid creating issues on every developer run
-  if (process.env.AI_ISSUE_CREATION !== 'true') return;
+  const aiIssueCreationEnabled = isEnabled(process.env.AI_ISSUE_CREATION);
+  if (!aiIssueCreationEnabled) {
+    console.log(
+      `[AI Analysis] Skipped for "${pickle.name}" because AI_ISSUE_CREATION is disabled (value: ${process.env.AI_ISSUE_CREATION ?? 'unset'}).`,
+    );
+    return;
+  }
 
   const rawMessage   = result.message ?? 'Unknown error';
   const errorMessage = typeof rawMessage === 'string' ? rawMessage : JSON.stringify(rawMessage);
@@ -70,9 +88,16 @@ After(async function (this: any, { result, pickle, gherkinDocument }: ITestCaseH
   console.log(`[AI Analysis] Is bug     : ${analysis.isBug}  (confidence: ${analysis.confidence}, severity: ${analysis.severity})`);
 
   // ── 2. GitHub issue creation ───────────────────────────────────────────────
-  if (!analysis.isBug || analysis.confidence === 'low') {
+  const deterministicAssertionMismatch = /(Expected pattern:|Received string:|expect\([^)]*\)\.toHave)/i.test(errorBody);
+  const shouldCreateIssue = analysis.confidence !== 'low' && (analysis.isBug || deterministicAssertionMismatch);
+
+  if (!shouldCreateIssue) {
     console.log('[AI Analysis] Classified as non-bug or low confidence — no issue created.');
     return;
+  }
+
+  if (!analysis.isBug && deterministicAssertionMismatch) {
+    console.log('[AI Analysis] Overriding non-bug classification due to deterministic assertion mismatch.');
   }
 
   // Build label list, avoiding duplicates
